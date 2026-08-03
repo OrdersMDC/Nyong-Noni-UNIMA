@@ -10,12 +10,14 @@ const CATEGORY_ORDER: Record<string, number> = {
   'Harapan II': 5,
   'Berbakat': 10,
   'Favorit': 11,
-  'Duta Lingkungan': 12,
-  'Duta Sosial': 13,
-  'Duta Budaya': 14,
-  'Duta Seni': 15,
-  'Persahabatan': 16,
-  'Digital': 17,
+  'Fotogenik': 12,
+  'Duta Lingkungan': 13,
+  'Duta Sosial': 14,
+  'Duta Budaya': 15,
+  'Duta Bahasa': 16,
+  'Duta Seni': 17,
+  'Persahabatan': 18,
+  'Digital': 19,
   'Other': 99,
 }
 
@@ -24,7 +26,7 @@ function renderInitial(name: string) {
 }
 
 function TitleholderCard({ item, gender }: { item: any; gender: string }) {
-  const isCombined = item.category?.startsWith('Duta') || item.category === 'Berbakat'
+  const isCombined = item.category?.startsWith('Duta') || item.category === 'Berbakat' || item.category === 'Fotogenik' || item.category === 'Persahabatan'
   return (
     <div className="rounded-[20px] border border-border bg-white overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
       <div className="aspect-[3/4] overflow-hidden bg-light-gray">

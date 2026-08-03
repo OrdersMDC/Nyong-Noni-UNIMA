@@ -152,7 +152,7 @@ function initSchema(database: Database.Database) {
     CREATE TABLE IF NOT EXISTS titleholders (
       id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
       tahun INTEGER NOT NULL,
-      category TEXT NOT NULL CHECK (category IN ('Juara Utama', 'Wakil I', 'Wakil II', 'Harapan I', 'Harapan II', 'Berbakat', 'Favorit', 'Persahabatan', 'Digital', 'Duta Lingkungan', 'Duta Sosial', 'Duta Budaya', 'Duta Seni', 'Other')),
+      category TEXT NOT NULL CHECK (category IN ('Juara Utama', 'Wakil I', 'Wakil II', 'Harapan I', 'Harapan II', 'Berbakat', 'Favorit', 'Fotogenik', 'Persahabatan', 'Digital', 'Duta Lingkungan', 'Duta Sosial', 'Duta Budaya', 'Duta Bahasa', 'Duta Seni', 'Other')),
       nyong_name TEXT NOT NULL,
       noni_name TEXT NOT NULL,
       faculty TEXT,
@@ -213,10 +213,13 @@ function initSchema(database: Database.Database) {
         'Harapan 2 Nyong', 'Harapan 2 Noni',
         'Nyong Berbakat', 'Noni Berbakat',
         'Nyong Favorit', 'Noni Favorit',
+        'Nyong Fotogenik', 'Noni Fotogenik',
         'Nyong Duta Lingkungan', 'Noni Duta Lingkungan',
         'Nyong Duta Sosial', 'Noni Duta Sosial',
         'Nyong Duta Budaya', 'Noni Duta Budaya',
-        'Nyong Duta Seni', 'Noni Duta Seni'
+        'Nyong Duta Bahasa', 'Noni Duta Bahasa',
+        'Nyong Duta Seni', 'Noni Duta Seni',
+        'Nyong Persahabatan', 'Noni Persahabatan'
       )),
       name TEXT NOT NULL,
       faculty TEXT,
