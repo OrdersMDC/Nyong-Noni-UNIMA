@@ -18,18 +18,18 @@ const TITLE_PAIRS: [string, string][] = [
 const PAIR_LABELS: Record<string, string> = {
   'Nyong UNIMA': 'Nyong UNIMA',
   'Noni UNIMA': 'Noni UNIMA',
-  'Wakil 1 Nyong': 'Wakil I',
-  'Wakil 1 Noni': 'Wakil I',
-  'Wakil 2 Nyong': 'Wakil II',
-  'Wakil 2 Noni': 'Wakil II',
-  'Harapan 1 Nyong': 'Harapan I',
-  'Harapan 1 Noni': 'Harapan I',
-  'Harapan 2 Nyong': 'Harapan II',
-  'Harapan 2 Noni': 'Harapan II',
-  'Nyong Berbakat': 'Berbakat',
-  'Noni Berbakat': 'Berbakat',
-  'Nyong Favorit': 'Favorit',
-  'Noni Favorit': 'Favorit',
+  'Wakil 1 Nyong': 'Wakil I Nyong Noni UNIMA 2025',
+  'Wakil 1 Noni': 'Wakil I Nyong Noni UNIMA 2025',
+  'Wakil 2 Nyong': 'Wakil II Nyong Noni UNIMA 2025',
+  'Wakil 2 Noni': 'Wakil II Nyong Noni UNIMA 2025',
+  'Harapan 1 Nyong': 'Harapan I Nyong Noni UNIMA 2025',
+  'Harapan 1 Noni': 'Harapan I Nyong Noni UNIMA 2025',
+  'Harapan 2 Nyong': 'Harapan II Nyong Noni UNIMA 2025',
+  'Harapan 2 Noni': 'Harapan II Nyong Noni UNIMA 2025',
+  'Nyong Berbakat': 'Berbakat Nyong Noni UNIMA 2025',
+  'Noni Berbakat': 'Berbakat Nyong Noni UNIMA 2025',
+  'Nyong Favorit': 'Favorit Nyong Noni UNIMA 2025',
+  'Noni Favorit': 'Favorit Nyong Noni UNIMA 2025',
   'Nyong Duta Lingkungan': 'Duta Lingkungan Nyong Noni UNIMA 2025',
   'Noni Duta Lingkungan': 'Duta Lingkungan Nyong Noni UNIMA 2025',
   'Nyong Duta Sosial': 'Duta Sosial Nyong Noni UNIMA 2025',
@@ -38,6 +38,11 @@ const PAIR_LABELS: Record<string, string> = {
   'Noni Duta Budaya': 'Duta Budaya Nyong Noni UNIMA 2025',
   'Nyong Duta Seni': 'Duta Seni Nyong Noni UNIMA 2025',
   'Noni Duta Seni': 'Duta Seni Nyong Noni UNIMA 2025',
+}
+
+function genderBadge(title: string) {
+  if (title.includes('Duta') || title.includes('Berbakat')) return 'Nyong Noni'
+  return title.includes('Nyong') ? 'Nyong' : 'Noni'
 }
 
 function TitleholderCard({ item }: { item: any }) {
@@ -62,6 +67,9 @@ function TitleholderCard({ item }: { item: any }) {
 
       {/* Info */}
       <div className="p-5">
+        <div className="mb-2 inline-flex items-center px-2 py-0.5 rounded-md bg-light-gray text-[10px] font-semibold uppercase tracking-widest text-dark-secondary">
+          {genderBadge(item.title)}
+        </div>
         <h3 className="text-headline text-dark-text mb-1">{item.name}</h3>
 
         {item.faculty && (

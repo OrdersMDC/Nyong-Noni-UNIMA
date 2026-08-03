@@ -24,7 +24,7 @@ function renderInitial(name: string) {
 }
 
 function TitleholderCard({ item, gender }: { item: any; gender: string }) {
-  const isDuta = item.category?.startsWith('Duta')
+  const isCombined = item.category?.startsWith('Duta') || item.category === 'Berbakat'
   return (
     <div className="rounded-[20px] border border-border bg-white overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
       <div className="aspect-[3/4] overflow-hidden bg-light-gray">
@@ -43,7 +43,7 @@ function TitleholderCard({ item, gender }: { item: any; gender: string }) {
             {item.category}
           </span>
           <span className="text-[10px] font-semibold uppercase tracking-widest text-dark-secondary">
-            {isDuta ? 'Nyong Noni' : gender}
+            {isCombined ? 'Nyong Noni' : gender}
           </span>
         </div>
         <h3 className="text-headline text-dark-text mb-1">{item.name}</h3>

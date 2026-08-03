@@ -8,14 +8,20 @@ export function getLocalDb(): Database.Database {
   if (!db) {
     const BetterSqlite3 = require('better-sqlite3')
     const dbDir = path.join(process.cwd(), 'data')
-    if (!fs.existsSync(dbDir)) {
-      fs.mkdirSync(dbDir, { recursive: true })
-    }
     const dbPath = path.join(dbDir, 'nyong-noni.db')
-    db = new BetterSqlite3(dbPath) as Database.Database
-    db.pragma('journal_mode = WAL')
+    let readonly = false
+    try {
+      if (!fs.existsSync(dbPath)) {
+        fs.mkdirSync(dbDir, { recursive: true })
+      }
+      db = new BetterSqlite3(dbPath) as Database.Database
+      db.pragma('journal_mode = WAL')
+    } catch {
+      readonly = true
+      db = new BetterSqlite3(dbPath, { readonly: true }) as Database.Database
+    }
     db.pragma('foreign_keys = ON')
-    initSchema(db)
+    if (!readonly) initSchema(db)
   }
   return db
 }
