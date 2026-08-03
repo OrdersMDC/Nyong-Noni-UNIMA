@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
-import { GraduationCap, MapPin } from 'lucide-react'
+import { GraduationCap, MapPin, Clock } from 'lucide-react'
 
 interface FinalistItem {
   id: string
@@ -89,9 +89,13 @@ export default function FinalistsClient({ finalists }: FinalistsClientProps) {
           </div>
 
           {filtered.length === 0 ? (
-            <div className="py-20 text-center">
-              <p className="text-body-lg text-dark-secondary">
-                Belum ada finalis yang diumumkan. Pantau terus informasi terbaru dari kami.
+            <div className="py-20 text-center max-w-xl mx-auto">
+              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-[#003DA5]/10">
+                <Clock className="h-7 w-7 text-[#003DA5]" />
+              </div>
+              <h2 className="text-display-md text-dark-text mb-3">Coming Soon</h2>
+              <p className="text-body-lg text-dark-secondary leading-relaxed">
+                Para finalis Nyong Noni UNIMA akan segera diumumkan. Pantau terus informasi terbaru dari kami.
               </p>
             </div>
           ) : (

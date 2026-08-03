@@ -6,7 +6,7 @@ import { FinalistsCarousel } from '@/components/finalists-carousel'
 import { getPublicFinalists, getReigningPair, getTitleholders } from '@/server/actions/finalists'
 import { getPublicNews, getPublicEvents } from '@/server/actions/content'
 import { getFaculties } from '@/server/actions/unima'
-import { MapPin, Instagram, ArrowRight, ChevronRight } from 'lucide-react'
+import { MapPin, Instagram, ArrowRight, ChevronRight, Clock } from 'lucide-react'
 
 export default async function HomePage() {
   const [finalists, reigningPair, news, events, faculties] = await Promise.all([
@@ -45,7 +45,7 @@ export default async function HomePage() {
               </Link>
               <Link href="/finalists">
                 <Button variant="secondary" size="lg" className="bg-white/10 text-white hover:bg-white/20 border border-white/30 h-14 px-8 text-body font-semibold">
-                  View Finalists
+                  Coming Soon
                 </Button>
               </Link>
             </div>
@@ -124,14 +124,14 @@ export default async function HomePage() {
             <div className="w-20 h-1 bg-gold mx-auto mt-4" />
           </div>
           <div className="grid gap-6 md:grid-cols-3">
-            <Link href="/finalists" className="group block relative overflow-hidden rounded-xxl bg-primary-blue p-8 min-h-[280px] flex flex-col justify-end transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div className="group block relative overflow-hidden rounded-xxl bg-primary-blue p-8 min-h-[280px] flex flex-col justify-end transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
               <div className="absolute top-0 right-0 w-32 h-32 bg-gold/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-              <h3 className="text-display-md text-white mb-2 relative">Finalists 2026</h3>
-              <p className="text-body text-white/70 relative">Meet the outstanding student ambassadors of Nyong Noni UNIMA 2026.</p>
-              <span className="inline-flex items-center gap-1 text-gold text-sm font-semibold mt-4 relative group-hover:gap-2 transition-all">
-                View Finalists <ArrowRight className="h-4 w-4" />
+              <span className="inline-flex items-center gap-1.5 text-gold text-xs font-semibold uppercase tracking-widest mb-3 relative">
+                <Clock className="h-3.5 w-3.5" /> Coming Soon
               </span>
-            </Link>
+              <h3 className="text-display-md text-white mb-2 relative">Finalists</h3>
+              <p className="text-body text-white/70 relative">Para finalis Nyong Noni UNIMA akan segera diumumkan.</p>
+            </div>
             <Link href="/news" className="group block relative overflow-hidden rounded-xxl bg-dark-text p-8 min-h-[280px] flex flex-col justify-end transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary-blue/20 rounded-full -translate-y-1/2 translate-x-1/2" />
               <h3 className="text-display-md text-white mb-2 relative">Latest News</h3>
