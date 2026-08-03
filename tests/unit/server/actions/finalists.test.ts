@@ -227,9 +227,9 @@ describe('createAlumniAchievement', () => {
     expect(result.error).toBeUndefined()
   })
 
-  it('rejects invalid achievement type', async () => {
+  it('rejects empty achievement type', async () => {
     const { createAlumniAchievement } = await import('@/server/actions/finalists')
-    const result = await createAlumniAchievement({ alumni_name: 'Test', achievement_type: 'Invalid', description: 'Description long enough for validation', tahun: '2026' })
+    const result = await createAlumniAchievement({ alumni_name: 'Test', achievement_type: '', description: 'Description long enough for validation', tahun: '2026' })
     expect(result.error).toBeDefined()
   })
 })

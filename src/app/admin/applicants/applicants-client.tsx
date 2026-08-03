@@ -1,28 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import { Plus, Search, Trash2, UserCheck, X, ChevronDown } from 'lucide-react'
+import { Plus, Search, Trash2, X } from 'lucide-react'
 import { updateApplicantStatus, deleteApplicant, createApplicant } from '@/server/actions/applicants'
 import { useRouter } from 'next/navigation'
-
-const STATUS_COLORS: Record<string, 'default' | 'gold' | 'success' | 'warning' | 'destructive' | 'secondary'> = {
-  pending: 'warning',
-  verified: 'success',
-  rejected: 'destructive',
-  finalist: 'gold',
-}
-
-const STATUS_LABELS: Record<string, string> = {
-  pending: 'Pending',
-  verified: 'Terverifikasi',
-  rejected: 'Ditolak',
-  finalist: 'Finalis',
-}
 
 interface Applicant {
   id: string
@@ -52,20 +37,19 @@ export function ApplicantsClient({
   const [search, setSearch] = useState('')
   const [showAdd, setShowAdd] = useState(false)
   const [loading, setLoading] = useState<string | null>(null)
+  const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const [form, setForm] = useState({
-    full_name: '',
-    email: '',
-    phone: '',
-    date_of_birth: '',
-    address: '',
-    city: '',
-    province: '',
-    height_cm: '',
-    weight_kg: '',
-    occupation: '',
-    education: '',
+    full_name: '', email: '', phone: '', date_of_birth: '', address: '',
+    city: '', province: '', height_cm: '', weight_kg: '', occupation: '', education: '',
   })
   const [formError, setFormError] = useState('')
+
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => setNotification(null), 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [notification])
 
   const filtered = applicants.filter(
     (a) =>
@@ -78,7 +62,10 @@ export function ApplicantsClient({
     setLoading(id)
     try {
       await updateApplicantStatus(id, status as any)
+      setNotification({ type: 'success', message: 'Status berhasil diubah' })
       router.refresh()
+    } catch {
+      setNotification({ type: 'error', message: 'Gagal mengubah status' })
     } finally {
       setLoading(null)
     }
@@ -89,7 +76,10 @@ export function ApplicantsClient({
     setLoading(id)
     try {
       await deleteApplicant(id)
+      setNotification({ type: 'success', message: 'Pendaftar berhasil dihapus' })
       router.refresh()
+    } catch {
+      setNotification({ type: 'error', message: 'Gagal menghapus pendaftar' })
     } finally {
       setLoading(null)
     }
@@ -110,6 +100,7 @@ export function ApplicantsClient({
       setFormError(String(result.error))
       return
     }
+    setNotification({ type: 'success', message: 'Pendaftar berhasil ditambahkan' })
     setShowAdd(false)
     setForm({ full_name: '', email: '', phone: '', date_of_birth: '', address: '', city: '', province: '', height_cm: '', weight_kg: '', occupation: '', education: '' })
     router.refresh()
@@ -126,13 +117,18 @@ export function ApplicantsClient({
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="font-display text-2xl font-bold text-dark">Pendaftar</h1>
+        <h1 className="text-2xl font-bold text-dark-text">Pendaftar</h1>
         <Button onClick={() => setShowAdd(true)}>
           <Plus className="mr-2 h-4 w-4" /> Tambah Pendaftar
         </Button>
       </div>
 
-      {/* Stats */}
+      {notification && (
+        <div className={`mb-4 rounded-lg p-3 text-sm ${notification.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
+          {notification.message}
+        </div>
+      )}
+
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
         {statCards.map((s) => (
           <Card key={s.label}>
@@ -147,7 +143,7 @@ export function ApplicantsClient({
       <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="font-display text-lg">Daftar Pendaftar</CardTitle>
+            <CardTitle className="text-lg">Daftar Pendaftar</CardTitle>
             <div className="relative w-64">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
               <Input
@@ -233,12 +229,11 @@ export function ApplicantsClient({
         </CardContent>
       </Card>
 
-      {/* Add Modal */}
       {showAdd && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <Card className="w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="font-display text-lg">Tambah Pendaftar</CardTitle>
+              <CardTitle className="text-lg">Tambah Pendaftar</CardTitle>
               <Button variant="ghost" size="icon" onClick={() => setShowAdd(false)}>
                 <X className="h-4 w-4" />
               </Button>

@@ -1,58 +1,108 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Plus, Trash2, X } from 'lucide-react'
+import { Plus, Trash2, X, Search, LayoutGrid, List } from 'lucide-react'
 import { createGalleryItem, deleteGalleryItem } from '@/server/actions/content'
 import { useRouter } from 'next/navigation'
 
 interface GalleryItem {
   id: string
   title: string
-  category: string
+  description: string
   image_url: string
+  category: string
   created_at: string
 }
 
 export function GalleryClient({ gallery }: { gallery: GalleryItem[] }) {
   const router = useRouter()
+  const [search, setSearch] = useState('')
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
   const [showAdd, setShowAdd] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const [form, setForm] = useState({ title: '', description: '', image_url: '', category: '' })
+
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => setNotification(null), 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [notification])
+
+  const filtered = gallery.filter(
+    (item) =>
+      item.title.toLowerCase().includes(search.toLowerCase()) ||
+      item.category.toLowerCase().includes(search.toLowerCase()),
+  )
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault()
-    const fd = new FormData()
-    Object.entries(form).forEach(([k, v]) => fd.append(k, v))
-    await createGalleryItem(fd)
-    setShowAdd(false)
-    setForm({ title: '', description: '', image_url: '', category: '' })
-    router.refresh()
+    setLoading(true)
+    try {
+      const fd = new FormData()
+      Object.entries(form).forEach(([k, v]) => fd.append(k, v))
+      await createGalleryItem(fd)
+      setNotification({ type: 'success', message: 'Foto berhasil ditambahkan' })
+      setShowAdd(false)
+      setForm({ title: '', description: '', image_url: '', category: '' })
+      router.refresh()
+    } catch {
+      setNotification({ type: 'error', message: 'Gagal menambahkan foto' })
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleDelete = async (id: string) => {
     if (!confirm('Hapus foto ini?')) return
-    await deleteGalleryItem(id)
-    router.refresh()
+    try {
+      await deleteGalleryItem(id)
+      setNotification({ type: 'success', message: 'Foto berhasil dihapus' })
+      router.refresh()
+    } catch {
+      setNotification({ type: 'error', message: 'Gagal menghapus foto' })
+    }
   }
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="font-display text-2xl font-bold text-dark">Galeri</h1>
-        <Button onClick={() => setShowAdd(true)}><Plus className="mr-2 h-4 w-4" />Tambah Foto</Button>
+        <h1 className="text-2xl font-bold text-dark-text">Galeri</h1>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="icon" onClick={() => setViewMode(viewMode === 'grid' ? 'table' : 'grid')}>
+            {viewMode === 'grid' ? <List className="h-4 w-4" /> : <LayoutGrid className="h-4 w-4" />}
+          </Button>
+          <Button onClick={() => setShowAdd(true)}><Plus className="mr-2 h-4 w-4" />Tambah Foto</Button>
+        </div>
       </div>
 
+      {notification && (
+        <div className={`mb-4 rounded-lg p-3 text-sm ${notification.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
+          {notification.message}
+        </div>
+      )}
+
       <Card>
-        <CardHeader><CardTitle className="font-display text-lg">Daftar Galeri</CardTitle></CardHeader>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">Daftar Galeri</CardTitle>
+            <div className="relative w-64">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+              <Input placeholder="Cari foto..." className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
+            </div>
+          </div>
+        </CardHeader>
         <CardContent>
-          {gallery.length === 0 ? (
-            <div className="text-center py-12 text-muted">Belum ada foto</div>
-          ) : (
+          {filtered.length === 0 ? (
+            <div className="text-center py-12 text-muted">{search ? 'Tidak ada hasil' : 'Belum ada foto'}</div>
+          ) : viewMode === 'grid' ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {gallery.map((item) => (
+              {filtered.map((item) => (
                 <div key={item.id} className="group relative rounded-lg overflow-hidden border border-border">
                   <div className="aspect-[4/3] bg-gradient-to-br from-primary/10 to-gold/10 flex items-center justify-center">
                     <span className="text-3xl">📸</span>
@@ -70,6 +120,33 @@ export function GalleryClient({ gallery }: { gallery: GalleryItem[] }) {
                 </div>
               ))}
             </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border text-left text-muted">
+                    <th className="pb-3 font-medium">Judul</th>
+                    <th className="pb-3 font-medium hidden md:table-cell">Kategori</th>
+                    <th className="pb-3 font-medium hidden lg:table-cell">Deskripsi</th>
+                    <th className="pb-3 font-medium text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((item) => (
+                    <tr key={item.id} className="border-b border-border/50 hover:bg-gray-50/50">
+                      <td className="py-3 font-medium">{item.title}</td>
+                      <td className="py-3 text-muted hidden md:table-cell">{item.category}</td>
+                      <td className="py-3 text-muted hidden lg:table-cell text-xs truncate max-w-xs">{item.description}</td>
+                      <td className="py-3 text-right">
+                        <Button variant="ghost" size="icon" className="text-red-600 hover:text-red-700" onClick={() => handleDelete(item.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </CardContent>
       </Card>
@@ -78,7 +155,7 @@ export function GalleryClient({ gallery }: { gallery: GalleryItem[] }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <Card className="w-full max-w-lg">
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="font-display text-lg">Tambah Foto</CardTitle>
+              <CardTitle className="text-lg">Tambah Foto</CardTitle>
               <Button variant="ghost" size="icon" onClick={() => setShowAdd(false)}><X className="h-4 w-4" /></Button>
             </CardHeader>
             <CardContent>
@@ -86,8 +163,8 @@ export function GalleryClient({ gallery }: { gallery: GalleryItem[] }) {
                 <div><Label>Judul</Label><Input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></div>
                 <div><Label>URL Gambar</Label><Input required type="url" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} placeholder="https://..." /></div>
                 <div><Label>Kategori</Label><Input required value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} /></div>
-                <div><Label>Deskripsi</Label><Input value={form.description || ''} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
-                <Button type="submit" className="w-full">Simpan</Button>
+                <div><Label>Deskripsi</Label><Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
+                <Button type="submit" className="w-full" disabled={loading}>{loading ? 'Menyimpan...' : 'Simpan'}</Button>
               </form>
             </CardContent>
           </Card>

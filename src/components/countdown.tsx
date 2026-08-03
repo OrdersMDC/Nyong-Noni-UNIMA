@@ -36,22 +36,22 @@ export function Countdown({ targetDate, className = '' }: CountdownProps) {
   if (!timeLeft) return null
 
   const items = [
-    { value: timeLeft.days, label: 'Hari' },
-    { value: timeLeft.hours, label: 'Jam' },
-    { value: timeLeft.minutes, label: 'Menit' },
-    { value: timeLeft.seconds, label: 'Detik' },
+    { value: timeLeft.days, label: 'Days' },
+    { value: timeLeft.hours, label: 'Hours' },
+    { value: timeLeft.minutes, label: 'Minutes' },
+    { value: timeLeft.seconds, label: 'Seconds' },
   ]
 
   return (
-    <div className={`flex items-center gap-3 sm:gap-4 ${className}`}>
+    <div className={`flex items-center justify-center gap-4 sm:gap-6 ${className}`}>
       {items.map((item) => (
         <div key={item.label} className="flex flex-col items-center">
-          <div className="flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-xl bg-white/10 backdrop-blur border border-white/20">
-            <span className="font-display text-xl sm:text-2xl font-bold text-white tabular-nums">
+          <div className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-xl bg-white/10 backdrop-blur border border-white/20">
+            <span className="text-2xl sm:text-3xl font-bold text-white tabular-nums">
               {String(item.value).padStart(2, '0')}
             </span>
           </div>
-          <span className="mt-1 text-[10px] font-medium uppercase tracking-wider text-white/60">
+          <span className="mt-2 text-xs font-medium uppercase tracking-wider text-gold">
             {item.label}
           </span>
         </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Crown, Pencil, Plus, Trash2, X } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { createTitleholder, updateTitleholder, deleteTitleholder } from '@/server/actions/finalists'
 
-const CATEGORIES = ['Juara Utama', 'Wakil I', 'Wakil II', 'Harapan I', 'Harapan II', 'Berbakat', 'Favorit', 'Persahabatan', 'Digital', 'Other'] as const
+const CATEGORIES = ['Juara Utama', 'Wakil I', 'Wakil II', 'Harapan I', 'Harapan II', 'Berbakat', 'Favorit', 'Persahabatan', 'Digital', 'Duta Lingkungan', 'Duta Sosial', 'Duta Budaya', 'Duta Seni', 'Other'] as const
 
 interface FormState {
   tahun: string
@@ -45,6 +45,14 @@ export function TitleholdersClient({ data }: { data: any[] }) {
   const [editId, setEditId] = useState<string | null>(null)
   const [form, setForm] = useState<FormState>(emptyForm)
   const [error, setError] = useState('')
+  const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => setNotification(null), 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [notification])
 
   const closeModal = () => {
     setShowModal(false)
@@ -97,6 +105,7 @@ export function TitleholdersClient({ data }: { data: any[] }) {
       return
     }
 
+    setNotification({ type: 'success', message: editId ? 'Titleholder berhasil diperbarui' : 'Titleholder berhasil ditambahkan' })
     closeModal()
     router.refresh()
   }
@@ -104,6 +113,7 @@ export function TitleholdersClient({ data }: { data: any[] }) {
   const handleDelete = async (id: string) => {
     if (!confirm('Hapus pasangan titleholder ini?')) return
     await deleteTitleholder(id)
+    setNotification({ type: 'success', message: 'Titleholder berhasil dihapus' })
     router.refresh()
   }
 
@@ -111,8 +121,8 @@ export function TitleholdersClient({ data }: { data: any[] }) {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-display-md text-ink">Titleholders</h1>
-          <p className="mt-1 text-body-sm text-ink-muted">Kelola pasangan Nyong &amp; Noni per kategori</p>
+          <h1 className="text-display-md text-dark-text">Titleholders</h1>
+          <p className="mt-1 text-body-sm text-dark-secondary">Kelola pasangan Nyong &amp; Noni per kategori</p>
         </div>
         <Button onClick={openAdd}>
           <Plus className="mr-2 h-4 w-4" />
@@ -120,14 +130,20 @@ export function TitleholdersClient({ data }: { data: any[] }) {
         </Button>
       </div>
 
-      <div className="rounded-xl border border-hairline bg-surface-2 overflow-hidden">
+      {notification && (
+        <div className={`mb-4 rounded-lg p-3 text-sm ${notification.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
+          {notification.message}
+        </div>
+      )}
+
+      <div className="rounded-xl border border-border bg-white overflow-hidden">
         {data.length === 0 ? (
-          <div className="py-12 text-center text-body-sm text-ink-muted">Belum ada data titleholders</div>
+          <div className="py-12 text-center text-body-sm text-dark-secondary">Belum ada data titleholders</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-body-sm">
               <thead>
-                <tr className="border-b border-hairline text-ink-muted">
+                <tr className="border-b border-border text-dark-secondary">
                   <th className="px-5 py-3.5 font-medium">Tahun</th>
                   <th className="px-5 py-3.5 font-medium">Kategori</th>
                   <th className="px-5 py-3.5 font-medium">Nyong</th>
@@ -138,17 +154,17 @@ export function TitleholdersClient({ data }: { data: any[] }) {
               </thead>
               <tbody>
                 {data.map((item: any) => (
-                  <tr key={item.id} className="border-b border-hairline/50 last:border-0">
-                    <td className="px-5 py-3.5 font-semibold text-ink">{item.tahun}</td>
+                  <tr key={item.id} className="border-b border-border/50 last:border-0">
+                    <td className="px-5 py-3.5 font-semibold text-dark-text">{item.tahun}</td>
                     <td className="px-5 py-3.5">
                       <span className="inline-flex items-center gap-1 rounded-full bg-accent-blue/10 px-2.5 py-0.5 text-xs font-medium text-accent-blue">
                         <Crown className="h-3 w-3" />
                         {item.category}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5 text-ink">{item.nyong_name}</td>
-                    <td className="px-5 py-3.5 text-ink">{item.noni_name}</td>
-                    <td className="px-5 py-3.5 text-ink-muted">{item.region}</td>
+                    <td className="px-5 py-3.5 text-dark-text">{item.nyong_name}</td>
+                    <td className="px-5 py-3.5 text-dark-text">{item.noni_name}</td>
+                    <td className="px-5 py-3.5 text-dark-secondary">{item.region}</td>
                     <td className="px-5 py-3.5 text-right">
                       <div className="flex items-center justify-end gap-1">
                         <Button variant="ghost" size="icon" onClick={() => openEdit(item)}>
@@ -169,9 +185,9 @@ export function TitleholdersClient({ data }: { data: any[] }) {
 
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-4">
-          <div className="my-8 w-full max-w-2xl rounded-2xl border border-hairline bg-surface-2 p-6">
+          <div className="my-8 w-full max-w-2xl rounded-2xl border border-border bg-white p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-headline text-ink">
+              <h2 className="text-headline text-dark-text">
                 {editId ? 'Edit Titleholder' : 'Tambah Titleholder'}
               </h2>
               <Button variant="ghost" size="icon" onClick={closeModal}>
@@ -182,117 +198,50 @@ export function TitleholdersClient({ data }: { data: any[] }) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>Tahun</Label>
-                  <Input
-                    required
-                    type="number"
-                    value={form.tahun}
-                    onChange={(event) => setForm({ ...form, tahun: event.target.value })}
-                  />
+                  <Input required type="number" value={form.tahun} onChange={(event) => setForm({ ...form, tahun: event.target.value })} />
                 </div>
                 <div>
                   <Label>Kategori</Label>
                   <select
-                    className="flex h-10 w-full rounded-lg border border-hairline bg-surface-2 px-3 py-2 text-body-sm text-ink"
+                    className="flex h-10 w-full rounded-lg border border-border bg-white px-3 py-2 text-body-sm text-dark-text"
                     value={form.category}
                     onChange={(event) => setForm({ ...form, category: event.target.value })}
                   >
                     {CATEGORIES.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
+                      <option key={category} value={category}>{category}</option>
                     ))}
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Nama Nyong</Label>
-                  <Input
-                    required
-                    value={form.nyong_name}
-                    onChange={(event) => setForm({ ...form, nyong_name: event.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label>Nama Noni</Label>
-                  <Input
-                    required
-                    value={form.noni_name}
-                    onChange={(event) => setForm({ ...form, noni_name: event.target.value })}
-                  />
-                </div>
+                <div><Label>Nama Nyong</Label><Input required value={form.nyong_name} onChange={(event) => setForm({ ...form, nyong_name: event.target.value })} /></div>
+                <div><Label>Nama Noni</Label><Input required value={form.noni_name} onChange={(event) => setForm({ ...form, noni_name: event.target.value })} /></div>
               </div>
 
-              <div>
-                <Label>Region / Kabupaten / Kota</Label>
-                <Input
-                  required
-                  value={form.region}
-                  onChange={(event) => setForm({ ...form, region: event.target.value })}
-                />
-              </div>
-
-              <div>
-                <Label>Motto</Label>
-                <Input
-                  value={form.motto}
-                  onChange={(event) => setForm({ ...form, motto: event.target.value })}
-                />
-              </div>
+              <div><Label>Region / Kabupaten / Kota</Label><Input required value={form.region} onChange={(event) => setForm({ ...form, region: event.target.value })} /></div>
+              <div><Label>Motto</Label><Input value={form.motto} onChange={(event) => setForm({ ...form, motto: event.target.value })} /></div>
 
               <div>
                 <Label>Biografi</Label>
-                <textarea
-                  className="flex min-h-[100px] w-full rounded-lg border border-hairline bg-surface-2 px-3 py-2 text-body-sm text-ink"
-                  value={form.biography}
-                  onChange={(event) => setForm({ ...form, biography: event.target.value })}
-                />
+                <textarea className="flex min-h-[100px] w-full rounded-lg border border-border bg-white px-3 py-2 text-body-sm text-dark-text" value={form.biography} onChange={(event) => setForm({ ...form, biography: event.target.value })} />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Foto Nyong (URL)</Label>
-                  <Input
-                    value={form.nyong_photo_url}
-                    onChange={(event) => setForm({ ...form, nyong_photo_url: event.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label>Foto Noni (URL)</Label>
-                  <Input
-                    value={form.noni_photo_url}
-                    onChange={(event) => setForm({ ...form, noni_photo_url: event.target.value })}
-                  />
-                </div>
+                <div><Label>Foto Nyong (URL)</Label><Input value={form.nyong_photo_url} onChange={(event) => setForm({ ...form, nyong_photo_url: event.target.value })} /></div>
+                <div><Label>Foto Noni (URL)</Label><Input value={form.noni_photo_url} onChange={(event) => setForm({ ...form, noni_photo_url: event.target.value })} /></div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Instagram Nyong</Label>
-                  <Input
-                    value={form.nyong_instagram}
-                    onChange={(event) => setForm({ ...form, nyong_instagram: event.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label>Instagram Noni</Label>
-                  <Input
-                    value={form.noni_instagram}
-                    onChange={(event) => setForm({ ...form, noni_instagram: event.target.value })}
-                  />
-                </div>
+                <div><Label>Instagram Nyong</Label><Input value={form.nyong_instagram} onChange={(event) => setForm({ ...form, nyong_instagram: event.target.value })} /></div>
+                <div><Label>Instagram Noni</Label><Input value={form.noni_instagram} onChange={(event) => setForm({ ...form, noni_instagram: event.target.value })} /></div>
               </div>
 
               {error && <p className="text-body-sm text-red-600">{error}</p>}
 
               <div className="flex gap-3 pt-2">
-                <Button type="submit" className="flex-1">
-                  {editId ? 'Simpan Perubahan' : 'Simpan'}
-                </Button>
-                <Button type="button" variant="outline" onClick={closeModal}>
-                  Batal
-                </Button>
+                <Button type="submit" className="flex-1">{editId ? 'Simpan Perubahan' : 'Simpan'}</Button>
+                <Button type="button" variant="outline" onClick={closeModal}>Batal</Button>
               </div>
             </form>
           </div>

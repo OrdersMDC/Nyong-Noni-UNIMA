@@ -5,6 +5,12 @@ export interface RegistrationFormData {
   email: string
   phone: string
   date_of_birth: string
+  place_of_birth: string
+  gender: 'Laki-laki' | 'Perempuan'
+  nim: string
+  faculty: string
+  study_program: string
+  semester: number
   address: string
   city: string
   province: string
@@ -12,5 +18,9 @@ export interface RegistrationFormData {
   weight_kg: number
   occupation: string
   education: string
-  photo?: File
+  instagram: string
+  tiktok: string
+  facebook: string
+  essay: string
+  consent: boolean
 }

@@ -1,22 +1,80 @@
-import Link from 'next/link'
-import { MapPin, Crown, Instagram, Quote } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Crown, Instagram, GraduationCap, BookOpen } from 'lucide-react'
 import { getTitleholders } from '@/server/actions/finalists'
+import { TitleholdersFilter } from './titleholders-filter'
 
 const CATEGORY_ORDER: Record<string, number> = {
+  'Juara Utama': 1,
   'Wakil I': 2,
   'Wakil II': 3,
   'Harapan I': 4,
   'Harapan II': 5,
   'Berbakat': 10,
   'Favorit': 11,
-  'Persahabatan': 12,
-  'Digital': 13,
+  'Duta Lingkungan': 12,
+  'Duta Sosial': 13,
+  'Duta Budaya': 14,
+  'Duta Seni': 15,
+  'Persahabatan': 16,
+  'Digital': 17,
   'Other': 99,
 }
 
 function renderInitial(name: string) {
-  return name.trim().charAt(0).toUpperCase() || 'N'
+  return name?.trim().charAt(0).toUpperCase() || 'N'
+}
+
+function TitleholderCard({ item, gender }: { item: any; gender: string }) {
+  const isDuta = item.category?.startsWith('Duta')
+  return (
+    <div className="rounded-[20px] border border-border bg-white overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+      <div className="aspect-[3/4] overflow-hidden bg-light-gray">
+        {item.photo_url ? (
+          <img src={item.photo_url} alt={item.name} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-display-xl text-dark-secondary">
+            {renderInitial(item.name)}
+          </div>
+        )}
+      </div>
+
+      <div className="p-5">
+        <div className="flex items-center justify-between gap-2 mb-2">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-gold-dark bg-gold/10 px-2.5 py-1 rounded-full">
+            {item.category}
+          </span>
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-dark-secondary">
+            {isDuta ? 'Nyong Noni' : gender}
+          </span>
+        </div>
+        <h3 className="text-headline text-dark-text mb-1">{item.name}</h3>
+
+        {item.faculty && (
+          <p className="flex items-center gap-1.5 text-body-sm text-dark-secondary mb-1">
+            <GraduationCap className="h-4 w-4 shrink-0" />
+            {item.faculty}
+          </p>
+        )}
+        {item.study_program && (
+          <p className="flex items-center gap-1.5 text-body-sm text-dark-secondary mb-3">
+            <BookOpen className="h-4 w-4 shrink-0" />
+            {item.study_program}
+          </p>
+        )}
+
+        {item.instagram && (
+          <a
+            href={`https://instagram.com/${item.instagram.replace('@', '')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-body-sm text-primary-blue hover:opacity-80 transition-opacity"
+          >
+            <Instagram className="h-4 w-4" />
+            @{item.instagram}
+          </a>
+        )}
+      </div>
+    </div>
+  )
 }
 
 export default async function TitleholdersPage({
@@ -29,28 +87,53 @@ export default async function TitleholdersPage({
   const allTitleholders = await getTitleholders().catch(() => []) as any[]
 
   const years = [...new Set(allTitleholders.map((item: any) => item.tahun))].sort((a, b) => b - a)
-  let titleholders = selectedYear
+  const titleholders = selectedYear
     ? allTitleholders.filter((item: any) => item.tahun === selectedYear)
     : allTitleholders
 
-  // Separate Juara Utama from the rest, sort others by category order
-  const juaraUtama = titleholders.find((item: any) => item.category === 'Juara Utama')
-  const others = titleholders
-    .filter((item: any) => item.id !== juaraUtama?.id)
+  const individuals = titleholders
+    .flatMap((item: any) => {
+      const cards: { id: string; name: string; photo_url?: string; instagram?: string; category: string; faculty?: string; study_program?: string; gender: string }[] = []
+      if (item.nyong_name) {
+        cards.push({
+          id: `${item.id}-nyong`,
+          name: item.nyong_name,
+          photo_url: item.nyong_photo_url,
+          instagram: item.nyong_instagram,
+          category: item.category,
+          faculty: item.faculty,
+          study_program: item.study_program,
+          gender: 'Nyong',
+        })
+      }
+      if (item.noni_name) {
+        cards.push({
+          id: `${item.id}-noni`,
+          name: item.noni_name,
+          photo_url: item.noni_photo_url,
+          instagram: item.noni_instagram,
+          category: item.category,
+          faculty: item.faculty,
+          study_program: item.study_program,
+          gender: 'Noni',
+        })
+      }
+      return cards
+    })
     .sort((a, b) => (CATEGORY_ORDER[a.category] || 99) - (CATEGORY_ORDER[b.category] || 99))
 
   return (
-    <div className="min-h-screen bg-canvas pb-[120px]">
-      <section className="relative flex flex-col items-center justify-center border-b border-hairline px-[20px] pb-[96px] pt-[180px] text-center">
+    <div className="min-h-screen bg-white pb-[120px]">
+      <section className="relative flex flex-col items-center justify-center border-b border-border px-[20px] pb-[96px] pt-[180px] text-center">
         <div className="mx-auto max-w-4xl">
-          <p className="mb-4 text-caption uppercase tracking-widest text-ink-muted">Nyong &amp; Noni</p>
+          <p className="mb-4 text-caption uppercase tracking-widest text-dark-secondary">Nyong &amp; Noni</p>
           <div className="mb-8 flex items-center justify-center gap-4 animate-fade-in">
             <Crown className="h-10 w-10 text-gold" />
-            <h1 className="text-display-xl tracking-tighter text-ink">Titleholders</h1>
+            <h1 className="text-display-xl tracking-tighter text-dark-text">Titleholders</h1>
             <Crown className="h-10 w-10 text-gold" />
           </div>
-          <p className="mx-auto max-w-2xl text-subhead text-ink-muted">
-            Arsip pasangan Nyong dan Noni Sulawesi Utara. Setiap pasangan adalah duta yang mewakili daerahnya masing-masing.
+          <p className="mx-auto max-w-2xl text-subhead text-dark-secondary">
+            Para pemegang gelar Nyong dan Noni UNIMA. Setiap gelar adalah bentuk apresiasi bagi para duta yang mewakili daerahnya masing-masing.
           </p>
         </div>
       </section>
@@ -59,192 +142,22 @@ export default async function TitleholdersPage({
         <div className="mx-auto max-w-7xl px-[20px]">
           <div className="mb-12 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="text-caption uppercase tracking-widest text-ink-muted">Arsip</p>
-              <h2 className="mt-2 text-display-lg text-ink">Daftar Titleholders</h2>
+              <p className="text-caption uppercase tracking-widest text-dark-secondary">Arsip</p>
+              <h2 className="mt-2 text-display-lg text-dark-text">Daftar Titleholders</h2>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <Link href="/titleholders">
-                <Button variant={selectedYear ? 'secondary' : 'primary'}>Semua Tahun</Button>
-              </Link>
-              {years.map((year) => (
-                <Link key={year} href={`/titleholders?tahun=${year}`}>
-                  <Button variant={selectedYear === year ? 'primary' : 'secondary'}>{year}</Button>
-                </Link>
-              ))}
-            </div>
+            <TitleholdersFilter years={years} selectedYear={selectedYear} />
           </div>
 
-          {titleholders.length === 0 ? (
+          {individuals.length === 0 ? (
             <div className="py-20 text-center">
-              <p className="text-body-lg text-ink-muted">Belum ada data titleholders</p>
+              <p className="text-body-lg text-dark-secondary">Belum ada data titleholders</p>
             </div>
           ) : (
-            <>
-              {/* ─── JUARA UTAMA (Highlight) ─── */}
-              {juaraUtama && (
-                <div className="mb-16">
-                  <div className="relative rounded-[24px] overflow-hidden border-2 border-gold/30 bg-gradient-to-br from-gold/5 via-surface-2 to-surface-2 shadow-lg">
-                    {/* Gold top accent */}
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-gold via-gold-light to-gold" />
-
-                    <div className="grid md:grid-cols-2 gap-px bg-hairline/50">
-                      {/* Nyong */}
-                      <div className="relative bg-surface-2">
-                        <div className="aspect-[2/3] md:aspect-[3/4] overflow-hidden">
-                          {juaraUtama.nyong_photo_url ? (
-                            <img src={juaraUtama.nyong_photo_url} alt={juaraUtama.nyong_name} className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-display-xl text-ink-muted">
-                              {renderInitial(juaraUtama.nyong_name)}
-                            </div>
-                          )}
-                        </div>
-                        <div className="p-5">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-[10px] font-semibold uppercase tracking-widest text-gold">Nyong</span>
-                            <span className="text-gold/50">|</span>
-                            <span className="flex items-center gap-1 text-xs text-ink-muted">
-                              <Instagram className="h-3 w-3" />
-                              @{juaraUtama.nyong_instagram || '—'}
-                            </span>
-                          </div>
-                          <h3 className="text-display-md text-ink">{juaraUtama.nyong_name}</h3>
-                        </div>
-                      </div>
-
-                      {/* Noni */}
-                      <div className="relative bg-surface-2">
-                        <div className="aspect-[2/3] md:aspect-[3/4] overflow-hidden">
-                          {juaraUtama.noni_photo_url ? (
-                            <img src={juaraUtama.noni_photo_url} alt={juaraUtama.noni_name} className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-display-xl text-ink-muted">
-                              {renderInitial(juaraUtama.noni_name)}
-                            </div>
-                          )}
-                        </div>
-                        <div className="p-5">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-[10px] font-semibold uppercase tracking-widest text-gold">Noni</span>
-                            <span className="text-gold/50">|</span>
-                            <span className="flex items-center gap-1 text-xs text-ink-muted">
-                              <Instagram className="h-3 w-3" />
-                              @{juaraUtama.noni_instagram || '—'}
-                            </span>
-                          </div>
-                          <h3 className="text-display-md text-ink">{juaraUtama.noni_name}</h3>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Pair info footer */}
-                    <div className="px-6 py-6 md:py-8 text-center">
-                      <div className="flex items-center justify-center gap-3 mb-4">
-                        <span className="text-caption text-ink-muted">{juaraUtama.tahun}</span>
-                        <span className="w-px h-4 bg-hairline" />
-                        <span className="text-[13px] font-bold uppercase tracking-widest text-gold">Juara Utama</span>
-                        <span className="w-px h-4 bg-hairline" />
-                        <span className="flex items-center gap-1 text-caption text-ink-muted">
-                          <MapPin className="h-3.5 w-3.5" />
-                          {juaraUtama.region}
-                        </span>
-                      </div>
-                      {juaraUtama.motto && (
-                        <p className="text-body-lg text-ink-muted italic max-w-2xl mx-auto relative">
-                          <Quote className="absolute -top-3 -left-6 h-6 w-6 text-gold/20" />
-                          &ldquo;{juaraUtama.motto}&rdquo;
-                        </p>
-                      )}
-                      {juaraUtama.biography && (
-                        <p className="text-body text-ink-muted max-w-2xl mx-auto mt-4">{juaraUtama.biography}</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* ─── OTHER CATEGORIES (seragam, center) ─── */}
-              {others.length > 0 && (
-                <div>
-                  <h3 className="text-headline text-ink mb-8 text-center">Kategori Lainnya</h3>
-                  <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {others.map((item: any) => (
-                      <div key={item.id} className="rounded-[20px] border border-hairline bg-surface-2 overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
-                        {/* Category badge — centered */}
-                        <div className="pt-4 pb-2 text-center">
-                          <span className="text-[11px] font-semibold uppercase tracking-wider text-gold-dark bg-gold/10 px-3 py-1 rounded-full">
-                            {item.category}
-                          </span>
-                        </div>
-
-                        {/* Photos + individual info */}
-                        <div className="grid grid-cols-2 gap-px bg-hairline">
-                          {/* Nyong */}
-                          <div className="bg-surface-2 text-center">
-                            <div className="aspect-square overflow-hidden bg-surface-1">
-                              {item.nyong_photo_url ? (
-                                <img src={item.nyong_photo_url} alt={item.nyong_name} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center text-display-md text-ink-muted">
-                                  {renderInitial(item.nyong_name)}
-                                </div>
-                              )}
-                            </div>
-                            <div className="p-3 space-y-1.5">
-                              <span className="block text-[9px] font-semibold uppercase tracking-widest text-ink-muted">Nyong</span>
-                              <h4 className="text-body-sm font-semibold text-ink">{item.nyong_name}</h4>
-                              <p className="flex items-center justify-center gap-1 text-[11px] text-ink-muted">
-                                <MapPin className="h-3 w-3 shrink-0" />
-                                {item.region}
-                              </p>
-                              {item.nyong_instagram && (
-                                <p className="flex items-center justify-center gap-1 text-[11px] text-ink-muted">
-                                  <Instagram className="h-3 w-3 shrink-0" />
-                                  @{item.nyong_instagram}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Noni */}
-                          <div className="bg-surface-2 text-center">
-                            <div className="aspect-square overflow-hidden bg-surface-1">
-                              {item.noni_photo_url ? (
-                                <img src={item.noni_photo_url} alt={item.noni_name} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center text-display-md text-ink-muted">
-                                  {renderInitial(item.noni_name)}
-                                </div>
-                              )}
-                            </div>
-                            <div className="p-3 space-y-1.5">
-                              <span className="block text-[9px] font-semibold uppercase tracking-widest text-ink-muted">Noni</span>
-                              <h4 className="text-body-sm font-semibold text-ink">{item.noni_name}</h4>
-                              <p className="flex items-center justify-center gap-1 text-[11px] text-ink-muted">
-                                <MapPin className="h-3 w-3 shrink-0" />
-                                {item.region}
-                              </p>
-                              {item.noni_instagram && (
-                                <p className="flex items-center justify-center gap-1 text-[11px] text-ink-muted">
-                                  <Instagram className="h-3 w-3 shrink-0" />
-                                  @{item.noni_instagram}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
-                        {item.motto && (
-                          <div className="px-4 pb-4 pt-3 text-center">
-                            <p className="text-xs text-ink-muted italic">&ldquo;{item.motto}&rdquo;</p>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {individuals.map((item) => (
+                <TitleholderCard key={item.id} item={item} gender={item.gender} />
+              ))}
+            </div>
           )}
         </div>
       </section>

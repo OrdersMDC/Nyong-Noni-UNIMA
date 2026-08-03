@@ -3,17 +3,16 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { Menu, X, ChevronDown } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Menu, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const NAV_ITEMS = [
   { label: 'Beranda', href: '/' },
   { label: 'Tentang', href: '/about' },
-  { label: 'Nyong & Noni', href: '/titleholders' },
+  { label: 'Titleholders', href: '/titleholders' },
   { label: 'Finalis', href: '/finalists' },
   { label: 'Hall of Fame', href: '/hall-of-fame' },
-  { label: 'Prestasi', href: '/alumni-achievements' },
+  { label: 'Prestasi Alumni', href: '/alumni-achievements' },
   { label: 'Galeri', href: '/gallery' },
   { label: 'Berita', href: '/news' },
   { label: 'Acara', href: '/events' },
@@ -34,51 +33,54 @@ export function Header() {
 
   return (
     <>
-      <a href="#main-content" className="absolute -top-10 left-0 z-[100] bg-surface-1 px-4 py-2 text-button text-ink transition-all focus:top-0">
+      <a
+        href="#main-content"
+        className="fixed -top-10 left-4 z-[100] bg-primary-blue text-white px-4 py-2 text-sm font-medium rounded-md transition-all focus:top-4"
+      >
         Langsung ke konten
       </a>
 
-      <header className="fixed top-0 left-0 right-0 z-50 bg-canvas border-b border-hairline transition-all duration-300">
-        <div className="mx-auto flex h-[56px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center gap-3 group active-scale">
-            <div className="flex flex-col">
-              <span className="text-body-sm font-bold text-ink leading-tight">
-                Nyong Noni Sulut
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-border transition-all duration-300">
+        <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          <Link href="/" className="flex items-center gap-2 group active-scale">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-lg font-bold text-dark-text tracking-tight">
+                Nyong Noni
+              </span>
+              <span className="text-lg font-bold text-primary-blue tracking-tight">
+                UNIMA
               </span>
             </div>
           </Link>
 
-          <nav className="hidden items-center gap-1 md:flex" aria-label="Navigasi utama">
+          <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Navigasi utama">
             {NAV_ITEMS.map((item) => {
-              const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
+              const isActive =
+                pathname === item.href ||
+                (item.href !== '/' && pathname.startsWith(item.href))
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'relative px-3 py-2 text-body-sm rounded-xs interactive-hover',
+                    'relative px-3 py-2 text-sm font-medium rounded-md transition-colors',
                     isActive
-                      ? 'text-ink bg-surface-1'
-                      : 'text-ink-muted hover:text-ink hover:bg-surface-1',
+                      ? 'text-primary-blue'
+                      : 'text-dark-text/70 hover:text-primary-blue',
                   )}
                   aria-current={isActive ? 'page' : undefined}
                 >
                   {item.label}
+                  {isActive && (
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-4/5 bg-gold rounded-full" />
+                  )}
                 </Link>
               )
             })}
-            <div className="ml-3 pl-3 border-l border-hairline flex gap-2">
-              <Link href="/login">
-                <Button variant="secondary">Masuk</Button>
-              </Link>
-              <Link href="/register">
-                <Button variant="primary">Daftar Sekarang</Button>
-              </Link>
-            </div>
           </nav>
 
           <button
-            className="md:hidden relative z-50 flex h-10 w-10 items-center justify-center rounded-full bg-surface-1 text-ink interactive-hover"
+            className="lg:hidden relative z-50 flex h-10 w-10 items-center justify-center rounded-lg border border-border text-dark-text hover:bg-light-gray transition-colors"
             onClick={() => setIsOpen(!isOpen)}
             aria-label={isOpen ? 'Tutup menu' : 'Buka menu'}
             aria-expanded={isOpen}
@@ -87,26 +89,30 @@ export function Header() {
           </button>
         </div>
 
-        {/* Mobile nav */}
         <div
           className={cn(
-            'fixed inset-0 z-40 bg-canvas md:hidden transition-transform duration-[400ms] ease-[var(--ease-drawer)] pt-[56px]',
+            'fixed inset-0 z-40 bg-white lg:hidden transition-transform duration-300 pt-[72px]',
             isOpen ? 'translate-x-0' : 'translate-x-full',
           )}
           aria-hidden={!isOpen}
         >
-          <nav className="flex flex-col px-4 py-6 space-y-1" aria-label="Navigasi mobile">
+          <nav
+            className="flex flex-col px-4 py-6 space-y-1"
+            aria-label="Navigasi mobile"
+          >
             {NAV_ITEMS.map((item) => {
-              const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
+              const isActive =
+                pathname === item.href ||
+                (item.href !== '/' && pathname.startsWith(item.href))
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'rounded-md px-4 py-3.5 text-body-sm interactive-hover',
+                    'rounded-lg px-4 py-3.5 text-sm font-medium transition-colors',
                     isActive
-                      ? 'text-ink bg-surface-1'
-                      : 'text-ink-muted hover:text-ink hover:bg-surface-1',
+                      ? 'text-primary-blue bg-primary-blue/5 border-l-2 border-gold'
+                      : 'text-dark-text/70 hover:text-primary-blue hover:bg-light-gray',
                   )}
                   aria-current={isActive ? 'page' : undefined}
                 >
@@ -114,18 +120,6 @@ export function Header() {
                 </Link>
               )
             })}
-            <div className="pt-4 mt-4 border-t border-hairline flex flex-col gap-2">
-              <Link href="/login" onClick={() => setIsOpen(false)}>
-                <Button variant="secondary" className="w-full">
-                  Masuk
-                </Button>
-              </Link>
-              <Link href="/register" onClick={() => setIsOpen(false)}>
-                <Button variant="primary" className="w-full">
-                  Daftar Sekarang
-                </Button>
-              </Link>
-            </div>
           </nav>
         </div>
       </header>

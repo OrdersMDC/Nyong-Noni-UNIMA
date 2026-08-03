@@ -6,7 +6,6 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { z } from 'zod'
 
 const loginSchema = z.object({
@@ -59,51 +58,64 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-canvas px-4">
-      <div className="w-full max-w-md rounded-2xl border border-hairline bg-surface-2 p-8">
-        <div className="text-center mb-6">
-          <h1 className="text-display-md text-ink">Admin Login</h1>
-          <p className="text-body-sm text-ink-muted mt-2">
-            {isLocal
-              ? 'Mode lokal - klik masuk untuk melanjutkan'
-              : 'Masuk ke panel admin Nyong Noni Sulut'}
-          </p>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#003DA5] to-[#002D7A] px-4">
+      <div className="w-full max-w-md">
+        <div className="mb-8 text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gold">
+            <span className="text-xl font-bold text-[#003DA5]">NN</span>
+          </div>
+          <h1 className="text-display-lg text-white">Nyong Noni UNIMA</h1>
+          <p className="mt-1 text-gold-light">Panel Admin</p>
         </div>
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@example.com"
-              required={!isLocal}
-            />
-          </div>
-          <div>
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required={!isLocal}
-            />
-          </div>
-          {error && (
-            <p className="text-sm text-red-600">{error}</p>
-          )}
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Memproses...' : 'Masuk'}
-          </Button>
-          {isLocal && (
-            <p className="text-xs text-center text-ink-muted mt-2">
-              Mode pengembangan lokal - autentikasi dilewati
-            </p>
-          )}
-        </form>
+
+        <div className="rounded-2xl bg-white p-8 shadow-xl">
+          <form onSubmit={handleLogin} className="space-y-5">
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@example.com"
+                className="mt-1"
+                required={!isLocal}
+              />
+            </div>
+            <div>
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="mt-1"
+                required={!isLocal}
+              />
+            </div>
+
+            {error && (
+              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-full bg-[#003DA5] px-4 py-2.5 text-sm font-semibold text-white transition-all duration-150 hover:bg-[#002D7A] disabled:opacity-50"
+            >
+              {loading ? 'Memproses...' : 'Masuk'}
+            </button>
+
+            {isLocal && (
+              <p className="mt-2 text-center text-xs text-gray-500">
+                Mode pengembangan lokal — autentikasi dilewati
+              </p>
+            )}
+          </form>
+        </div>
       </div>
     </div>
   )

@@ -27,7 +27,8 @@ interface ApplicantRecord {
 
 export async function submitRegistration(formData: FormData) {
   const rawData = Object.fromEntries(formData.entries())
-  const parsed = registrationSchema.safeParse(rawData)
+  const normalized = { ...rawData, consent: rawData.consent === 'true' }
+  const parsed = registrationSchema.safeParse(normalized)
 
   if (!parsed.success) {
     const fieldErrors = parsed.error.flatten().fieldErrors

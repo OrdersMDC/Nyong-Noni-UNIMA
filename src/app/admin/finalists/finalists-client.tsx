@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Search, Trash2, Crown, X, Instagram, FileText, Upload } from 'lucide-react'
+import { Search, Trash2, Crown, X, FileText, Instagram, Upload } from 'lucide-react'
 import { updateApplicantStatus, deleteApplicant } from '@/server/actions/applicants'
 import { updateFinalistData, uploadFinalistPhoto } from '@/server/actions/finalists'
 import { useRouter } from 'next/navigation'
@@ -65,6 +65,14 @@ export function FinalistsClient({ applicants }: { applicants: Applicant[] }) {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const [editData, setEditData] = useState<EditData | null>(null)
+  const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => setNotification(null), 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [notification])
 
   const finalists = applicants.filter((a) => a.status === 'finalist')
   const candidates = applicants.filter((a) => a.status !== 'finalist' && a.status !== 'rejected')
@@ -78,18 +86,18 @@ export function FinalistsClient({ applicants }: { applicants: Applicant[] }) {
 
   const handlePromote = async (id: string) => {
     setLoading(id)
-    try { await updateApplicantStatus(id, 'finalist'); router.refresh() } finally { setLoading(null) }
+    try { await updateApplicantStatus(id, 'finalist'); setNotification({ type: 'success', message: 'Finalis berhasil ditambahkan' }); router.refresh() } catch { setNotification({ type: 'error', message: 'Gagal menambahkan finalis' }) } finally { setLoading(null) }
   }
 
   const handleDemote = async (id: string) => {
     setLoading(id)
-    try { await updateApplicantStatus(id, 'verified'); router.refresh() } finally { setLoading(null) }
+    try { await updateApplicantStatus(id, 'verified'); setNotification({ type: 'success', message: 'Status finalis dihapus' }); router.refresh() } catch { setNotification({ type: 'error', message: 'Gagal mengubah status' }) } finally { setLoading(null) }
   }
 
   const handleDelete = async (id: string) => {
     if (!confirm('Yakin ingin menghapus?')) return
     setLoading(id)
-    try { await deleteApplicant(id); router.refresh() } finally { setLoading(null) }
+    try { await deleteApplicant(id); setNotification({ type: 'success', message: 'Data berhasil dihapus' }); router.refresh() } catch { setNotification({ type: 'error', message: 'Gagal menghapus data' }) } finally { setLoading(null) }
   }
 
   const openEdit = (a: Applicant) => {
@@ -146,23 +154,31 @@ export function FinalistsClient({ applicants }: { applicants: Applicant[] }) {
 
       const result = await updateFinalistData(data as any)
       if (result.error) { setError(result.error); return }
+      setNotification({ type: 'success', message: 'Data finalis berhasil disimpan' })
       setEditData(null)
       router.refresh()
+    } catch {
+      setNotification({ type: 'error', message: 'Gagal menyimpan data' })
     } finally { setLoading(null) }
   }
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="font-display text-2xl font-bold text-dark">Finalis</h1>
+        <h1 className="text-2xl font-bold text-dark-text">Finalis</h1>
       </div>
 
+      {notification && (
+        <div className={`mb-4 rounded-lg p-3 text-sm ${notification.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
+          {notification.message}
+        </div>
+      )}
+
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Finalists */}
         <Card>
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="font-display text-lg flex items-center gap-2">
+              <CardTitle className="text-lg flex items-center gap-2">
                 <Crown className="h-5 w-5 text-gold" />
                 Finalis ({finalists.length})
               </CardTitle>
@@ -203,11 +219,10 @@ export function FinalistsClient({ applicants }: { applicants: Applicant[] }) {
           </CardContent>
         </Card>
 
-        {/* Candidates */}
         <Card>
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="font-display text-lg">Calon Finalis ({candidates.length})</CardTitle>
+              <CardTitle className="text-lg">Calon Finalis ({candidates.length})</CardTitle>
               <div className="relative w-48">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
                 <Input placeholder="Cari..." className="pl-9 text-sm" value={search} onChange={(e) => setSearch(e.target.value)} />
@@ -236,18 +251,16 @@ export function FinalistsClient({ applicants }: { applicants: Applicant[] }) {
         </Card>
       </div>
 
-      {/* Edit Finalis Modal */}
       {editData && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-4 pt-8">
           <Card className="w-full max-w-2xl my-8">
             <CardHeader className="flex flex-row items-center justify-between sticky top-0 bg-white z-10 border-b">
-              <CardTitle className="font-display text-lg">Edit Finalis: {editData.full_name}</CardTitle>
+              <CardTitle className="text-lg">Edit Finalis: {editData.full_name}</CardTitle>
               <Button variant="ghost" size="icon" onClick={() => setEditData(null)}><X className="h-4 w-4" /></Button>
             </CardHeader>
             <CardContent className="pt-6">
               {error && <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</div>}
               <form onSubmit={handleSave} className="space-y-6">
-                {/* Photo */}
                 <div>
                   <Label>Foto Finalis (PNG dengan background transparan)</Label>
                   <div className="mt-2 flex items-center gap-4">

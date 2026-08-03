@@ -39,6 +39,12 @@ export interface Database {
           email: string
           phone: string
           date_of_birth: string
+          place_of_birth: string | null
+          gender: string | null
+          nim: string | null
+          faculty: string | null
+          study_program: string | null
+          semester: number | null
           address: string
           city: string
           province: string
@@ -46,7 +52,18 @@ export interface Database {
           weight_kg: number
           occupation: string
           education: string
+          instagram: string | null
+          tiktok: string | null
+          facebook: string | null
           photo_url: string | null
+          passport_photo_url: string | null
+          fullbody_photo_url: string | null
+          ktm_url: string | null
+          ktp_url: string | null
+          cv_url: string | null
+          statement_letter_url: string | null
+          essay: string | null
+          consent: boolean
           status: 'pending' | 'verified' | 'rejected' | 'finalist'
           created_at: string
           updated_at: string
@@ -58,14 +75,31 @@ export interface Database {
           email: string
           phone: string
           date_of_birth: string
+          place_of_birth?: string | null
+          gender?: string | null
+          nim?: string | null
+          faculty?: string | null
+          study_program?: string | null
+          semester?: number | null
           address: string
           city: string
           province: string
-          height_cm: number
-          weight_kg: number
-          occupation: string
-          education: string
+          height_cm?: number
+          weight_kg?: number
+          occupation?: string
+          education?: string
+          instagram?: string | null
+          tiktok?: string | null
+          facebook?: string | null
           photo_url?: string | null
+          passport_photo_url?: string | null
+          fullbody_photo_url?: string | null
+          ktm_url?: string | null
+          ktp_url?: string | null
+          cv_url?: string | null
+          statement_letter_url?: string | null
+          essay?: string | null
+          consent?: boolean
           status?: 'pending' | 'verified' | 'rejected' | 'finalist'
           created_at?: string
           updated_at?: string
@@ -77,6 +111,12 @@ export interface Database {
           email?: string
           phone?: string
           date_of_birth?: string
+          place_of_birth?: string | null
+          gender?: string | null
+          nim?: string | null
+          faculty?: string | null
+          study_program?: string | null
+          semester?: number | null
           address?: string
           city?: string
           province?: string
@@ -84,7 +124,18 @@ export interface Database {
           weight_kg?: number
           occupation?: string
           education?: string
+          instagram?: string | null
+          tiktok?: string | null
+          facebook?: string | null
           photo_url?: string | null
+          passport_photo_url?: string | null
+          fullbody_photo_url?: string | null
+          ktm_url?: string | null
+          ktp_url?: string | null
+          cv_url?: string | null
+          statement_letter_url?: string | null
+          essay?: string | null
+          consent?: boolean
           status?: 'pending' | 'verified' | 'rejected' | 'finalist'
           updated_at?: string
         }
@@ -163,6 +214,7 @@ export interface Database {
           description: string
           date: string
           location: string
+          category: string | null
           image_url: string | null
           published: boolean
           created_at: string
@@ -175,6 +227,7 @@ export interface Database {
           description: string
           date: string
           location: string
+          category?: string | null
           image_url?: string | null
           published?: boolean
           created_at?: string
@@ -187,6 +240,7 @@ export interface Database {
           description?: string
           date?: string
           location?: string
+          category?: string | null
           image_url?: string | null
           published?: boolean
           updated_at?: string
@@ -199,6 +253,8 @@ export interface Database {
           category: 'Juara Utama' | 'Wakil I' | 'Wakil II' | 'Harapan I' | 'Harapan II' | 'Berbakat' | 'Favorit' | 'Persahabatan' | 'Digital' | 'Other'
           nyong_name: string
           noni_name: string
+          faculty: string | null
+          study_program: string | null
           region: string
           motto: string | null
           biography: string | null
@@ -216,6 +272,8 @@ export interface Database {
           category: 'Juara Utama' | 'Wakil I' | 'Wakil II' | 'Harapan I' | 'Harapan II' | 'Berbakat' | 'Favorit' | 'Persahabatan' | 'Digital' | 'Other'
           nyong_name: string
           noni_name: string
+          faculty?: string | null
+          study_program?: string | null
           region: string
           motto?: string | null
           biography?: string | null
@@ -233,6 +291,8 @@ export interface Database {
           category?: 'Juara Utama' | 'Wakil I' | 'Wakil II' | 'Harapan I' | 'Harapan II' | 'Berbakat' | 'Favorit' | 'Persahabatan' | 'Digital' | 'Other'
           nyong_name?: string
           noni_name?: string
+          faculty?: string | null
+          study_program?: string | null
           region?: string
           motto?: string | null
           biography?: string | null
@@ -242,6 +302,216 @@ export interface Database {
           noni_instagram?: string | null
           sort_order?: number
           updated_at?: string
+        }
+      }
+      faculties: {
+        Row: {
+          id: string
+          name: string
+          code: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          code: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          code?: string
+          created_at?: string
+        }
+      }
+      study_programs: {
+        Row: {
+          id: string
+          faculty_id: string
+          name: string
+          code: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          faculty_id: string
+          name: string
+          code: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          faculty_id?: string
+          name?: string
+          code?: string
+          created_at?: string
+        }
+      }
+      sponsors: {
+        Row: {
+          id: string
+          name: string
+          logo_url: string | null
+          website: string | null
+          type: 'sponsor' | 'partner' | 'media'
+          sort_order: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          logo_url?: string | null
+          website?: string | null
+          type?: 'sponsor' | 'partner' | 'media'
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          logo_url?: string | null
+          website?: string | null
+          type?: 'sponsor' | 'partner' | 'media'
+          sort_order?: number
+          updated_at?: string
+        }
+      }
+      settings: {
+        Row: {
+          id: string
+          key: string
+          value: Json
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          key: string
+          value: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          key?: string
+          value?: Json
+          updated_at?: string
+        }
+      }
+      current_titleholders: {
+        Row: {
+          id: string
+          title: string
+          name: string
+          faculty: string | null
+          study_program: string | null
+          photo_url: string | null
+          instagram: string | null
+          biography: string | null
+          sort_order: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          name: string
+          faculty?: string | null
+          study_program?: string | null
+          photo_url?: string | null
+          instagram?: string | null
+          biography?: string | null
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          name?: string
+          faculty?: string | null
+          study_program?: string | null
+          photo_url?: string | null
+          instagram?: string | null
+          biography?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+      }
+      hall_of_fame: {
+        Row: {
+          id: string
+          tahun: number
+          nyong_name: string
+          noni_name: string
+          nyong_photo_url: string | null
+          noni_photo_url: string | null
+          kabupaten_kota: string
+          category: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tahun: number
+          nyong_name: string
+          noni_name: string
+          nyong_photo_url?: string | null
+          noni_photo_url?: string | null
+          kabupaten_kota: string
+          category?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tahun?: number
+          nyong_name?: string
+          noni_name?: string
+          nyong_photo_url?: string | null
+          noni_photo_url?: string | null
+          kabupaten_kota?: string
+          category?: string | null
+          updated_at?: string
+        }
+      }
+      alumni_achievements: {
+        Row: {
+          id: string
+          alumni_name: string
+          achievement_type: string
+          description: string
+          tahun: string
+          photo_url: string | null
+          instagram: string | null
+          current_position: string | null
+          organization: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          alumni_name: string
+          achievement_type: string
+          description: string
+          tahun: string
+          photo_url?: string | null
+          instagram?: string | null
+          current_position?: string | null
+          organization?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          alumni_name?: string
+          achievement_type?: string
+          description?: string
+          tahun?: string
+          photo_url?: string | null
+          instagram?: string | null
+          current_position?: string | null
+          organization?: string | null
         }
       }
     }

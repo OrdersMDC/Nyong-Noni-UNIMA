@@ -1,66 +1,100 @@
 import { getApplicantStats } from '@/server/actions/applicants'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Users, UserCheck, Newspaper, Calendar } from 'lucide-react'
+import { getNews, getEvents } from '@/server/actions/content'
+import { getAlumniAchievements, getTitleholders } from '@/server/actions/finalists'
+import { getCurrentTitleholders } from '@/server/actions/unima'
 import Link from 'next/link'
+import { Users, UserCheck, Newspaper, Calendar, Award, Crown } from 'lucide-react'
 
 export default async function AdminDashboard() {
-  const stats = await getApplicantStats().catch(() => ({
-    total: 0, pending: 0, verified: 0, rejected: 0, finalist: 0,
-  }))
+  const [stats, news, events, alumni, titleholders, currentTitleholders] = await Promise.all([
+    getApplicantStats().catch(() => ({ total: 0, pending: 0, verified: 0, rejected: 0, finalist: 0 })),
+    getNews().catch(() => []),
+    getEvents().catch(() => []),
+    getAlumniAchievements().catch(() => []),
+    getTitleholders().catch(() => []),
+    getCurrentTitleholders().catch(() => []),
+  ])
 
-  const adminLinks = [
+  const cards = [
     {
-      label: 'Pendaftar',
+      label: 'Total Applicants',
       value: stats.total,
       icon: Users,
-      color: 'text-blue-600',
       href: '/admin/applicants',
-      detail: `${stats.pending} pending`,
+      detail: `${stats.pending} pending · ${stats.verified} verified · ${stats.finalist} finalist`,
+      iconBg: 'bg-blue-100',
+      iconColor: 'text-[#003DA5]',
     },
     {
-      label: 'Finalis',
+      label: 'Total Finalists',
       value: stats.finalist,
       icon: UserCheck,
-      color: 'text-gold',
       href: '/admin/finalists',
-      detail: `${stats.verified} terverifikasi`,
+      detail: `${stats.verified} verified applicants`,
+      iconBg: 'bg-gold/20',
+      iconColor: 'text-gold-dark',
     },
     {
-      label: 'Berita',
-      value: '0',
+      label: 'News',
+      value: (news as any[]).length,
       icon: Newspaper,
-      color: 'text-green-600',
       href: '/admin/news',
-      detail: 'kelola berita',
+      detail: 'Manage news articles',
+      iconBg: 'bg-green-100',
+      iconColor: 'text-green-600',
     },
     {
-      label: 'Acara',
-      value: '0',
+      label: 'Events',
+      value: (events as any[]).length,
       icon: Calendar,
-      color: 'text-purple-600',
       href: '/admin/events',
-      detail: 'kelola acara',
+      detail: 'Manage events',
+      iconBg: 'bg-purple-100',
+      iconColor: 'text-purple-600',
+    },
+    {
+      label: 'Alumni Achievements',
+      value: (alumni as any[]).length,
+      icon: Award,
+      href: '/admin/alumni-achievements',
+      detail: 'Alumni accomplishments',
+      iconBg: 'bg-orange-100',
+      iconColor: 'text-orange-600',
+    },
+    {
+      label: 'Titleholders',
+      value: (titleholders as any[]).length + (currentTitleholders as any[]).length,
+      icon: Crown,
+      href: '/admin/titleholders',
+      detail: `${(titleholders as any[]).length} past · ${(currentTitleholders as any[]).length} current`,
+      iconBg: 'bg-pink-100',
+      iconColor: 'text-pink-600',
     },
   ]
 
   return (
     <div>
-      <h1 className="text-display-md text-ink mb-8">Dashboard</h1>
+      <div className="mb-8">
+        <h1 className="text-display-md text-[#1A1A1A]">Dashboard</h1>
+        <p className="mt-1 text-sm text-[#6B7280]">
+          Welcome to the Nyong Noni UNIMA admin panel
+        </p>
+      </div>
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {adminLinks.map((link) => {
-          const Icon = link.icon
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {cards.map((card) => {
+          const Icon = card.icon
           return (
-            <Link key={link.href} href={link.href}>
-              <div className="rounded-xl border border-hairline bg-surface-2 p-5 transition-all hover:-translate-y-0.5 hover:shadow-md cursor-pointer">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-caption text-ink-muted uppercase tracking-widest">
-                    {link.label}
-                  </span>
-                  <Icon className={`h-5 w-5 ${link.color}`} />
+            <Link key={card.href} href={card.href}>
+              <div className="group cursor-pointer rounded-xl border border-[#E2E8F0] bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+                <div className="mb-4 flex items-center justify-between">
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${card.iconBg}`}>
+                    <Icon className={`h-5 w-5 ${card.iconColor}`} />
+                  </div>
                 </div>
-                <div className="text-display-md text-ink">{link.value}</div>
-                <p className="text-body-sm text-ink-muted mt-1">{link.detail}</p>
+                <div className="text-3xl font-bold text-[#1A1A1A]">{card.value}</div>
+                <div className="mt-1 text-sm font-medium text-[#1A1A1A]">{card.label}</div>
+                <p className="mt-0.5 text-xs text-[#6B7280]">{card.detail}</p>
               </div>
             </Link>
           )

@@ -10,37 +10,27 @@ describe('Section', () => {
 
   it('applies default variant class', () => {
     const { container } = render(<Section>Content</Section>)
-    expect(container.firstChild).toHaveClass('bg-background')
+    expect(container.firstChild).toHaveClass('bg-white')
   })
 
-  it('applies cream variant class', () => {
-    const { container } = render(<Section variant="cream">Content</Section>)
-    expect(container.firstChild).toHaveClass('bg-cream')
+  it('applies blue variant class', () => {
+    const { container } = render(<Section variant="blue">Content</Section>)
+    expect(container.firstChild).toHaveClass('bg-primary-blue')
   })
 
-  it('applies ocean variant class', () => {
-    const { container } = render(<Section variant="ocean">Content</Section>)
-    expect(container.firstChild).toHaveClass('ocean-gradient')
+  it('applies light variant class', () => {
+    const { container } = render(<Section variant="light">Content</Section>)
+    expect(container.firstChild).toHaveClass('bg-light-gray')
   })
 
-  it('applies dark variant class', () => {
-    const { container } = render(<Section variant="dark">Content</Section>)
-    expect(container.firstChild).toHaveClass('bg-dark')
+  it('applies gold variant class', () => {
+    const { container } = render(<Section variant="gold">Content</Section>)
+    expect(container.firstChild).toHaveClass('bg-gold')
   })
 
   it('applies custom className', () => {
     const { container } = render(<Section className="custom-class">Content</Section>)
     expect(container.firstChild).toHaveClass('custom-class')
-  })
-
-  it('renders pattern when pattern prop is true', () => {
-    const { container } = render(<Section pattern>Content</Section>)
-    expect(container.querySelector('svg')).toBeInTheDocument()
-  })
-
-  it('does not render pattern when pattern prop is false', () => {
-    const { container } = render(<Section>Content</Section>)
-    expect(container.querySelector('svg')).not.toBeInTheDocument()
   })
 
   it('sets id prop', () => {

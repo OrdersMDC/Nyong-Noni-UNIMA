@@ -20,6 +20,28 @@ vi.mock('@/lib/supabase/admin', () => ({
 
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
 
+const VALID_APPLICANT = {
+  full_name: 'John Doe',
+  email: 'john@example.com',
+  phone: '081234567890',
+  date_of_birth: '2000-01-01',
+  place_of_birth: 'Manado',
+  gender: 'Laki-laki',
+  nim: '20123456',
+  faculty: 'fip',
+  study_program: 'fip_pgsd',
+  semester: 4,
+  address: 'Jl. Contoh No. 123, Kelurahan, Kecamatan',
+  city: 'Manado',
+  province: 'Sulawesi Utara',
+  height_cm: 170,
+  weight_kg: 60,
+  occupation: 'Mahasiswa',
+  education: 'Sarjana S1',
+  essay: 'I want to join Nyong Noni UNIMA because I am passionate about culture and tourism promotion in North Sulawesi.',
+  consent: true,
+}
+
 beforeEach(() => {
   vi.clearAllMocks()
 })
@@ -27,19 +49,7 @@ beforeEach(() => {
 describe('createApplicant', () => {
   it('validates correct data successfully', async () => {
     const { createApplicant } = await import('@/server/actions/applicants')
-    const result = await createApplicant({
-      full_name: 'John Doe',
-      email: 'john@example.com',
-      phone: '081234567890',
-      date_of_birth: '2000-01-01',
-      address: 'Jl. Contoh No. 123, Kelurahan, Kecamatan',
-      city: 'Manado',
-      province: 'Sulawesi Utara',
-      height_cm: 170,
-      weight_kg: 60,
-      occupation: 'Mahasiswa',
-      education: 'Sarjana S1',
-    })
+    const result = await createApplicant(VALID_APPLICANT)
     expect(result.error).toBeUndefined()
     expect(result.data).toBeDefined()
   })
@@ -51,6 +61,11 @@ describe('createApplicant', () => {
       email: '',
       phone: '',
       date_of_birth: '',
+      place_of_birth: '',
+      nim: '',
+      faculty: '',
+      study_program: '',
+      semester: undefined as any,
       address: '',
       city: '',
       province: '',
@@ -58,6 +73,8 @@ describe('createApplicant', () => {
       weight_kg: 0 as any,
       occupation: '',
       education: '',
+      essay: '',
+      consent: undefined as any,
     })
     expect(result.error).toBeDefined()
     expect(typeof result.error).toBe('string')
@@ -66,58 +83,21 @@ describe('createApplicant', () => {
 
   it('returns error for invalid email', async () => {
     const { createApplicant } = await import('@/server/actions/applicants')
-    const result = await createApplicant({
-      full_name: 'John Doe',
-      email: 'not-an-email',
-      phone: '081234567890',
-      date_of_birth: '2000-01-01',
-      address: 'Jl. Contoh No. 123, Kelurahan, Kecamatan',
-      city: 'Manado',
-      province: 'Sulawesi Utara',
-      height_cm: 170,
-      weight_kg: 60,
-      occupation: 'Mahasiswa',
-      education: 'Sarjana S1',
-    })
+    const result = await createApplicant({ ...VALID_APPLICANT, email: 'not-an-email' })
     expect(result.error).toBeDefined()
     expect(result.error).toContain('email')
   })
 
   it('returns error for height below minimum', async () => {
     const { createApplicant } = await import('@/server/actions/applicants')
-    const result = await createApplicant({
-      full_name: 'John Doe',
-      email: 'john@example.com',
-      phone: '081234567890',
-      date_of_birth: '2000-01-01',
-      address: 'Jl. Contoh No. 123, Kelurahan, Kecamatan',
-      city: 'Manado',
-      province: 'Sulawesi Utara',
-      height_cm: 100,
-      weight_kg: 60,
-      occupation: 'Mahasiswa',
-      education: 'Sarjana S1',
-    })
+    const result = await createApplicant({ ...VALID_APPLICANT, height_cm: 100 })
     expect(result.error).toBeDefined()
     expect(result.error).toContain('Tinggi')
   })
 
   it('accepts custom status override', async () => {
     const { createApplicant } = await import('@/server/actions/applicants')
-    const result = await createApplicant({
-      full_name: 'John Doe',
-      email: 'john@example.com',
-      phone: '081234567890',
-      date_of_birth: '2000-01-01',
-      address: 'Jl. Contoh No. 123, Kelurahan, Kecamatan',
-      city: 'Manado',
-      province: 'Sulawesi Utara',
-      height_cm: 170,
-      weight_kg: 60,
-      occupation: 'Mahasiswa',
-      education: 'Sarjana S1',
-      status: 'finalist',
-    })
+    const result = await createApplicant({ ...VALID_APPLICANT, status: 'finalist' })
     expect(result.error).toBeUndefined()
     expect(result.data).toBeDefined()
   })
@@ -131,6 +111,12 @@ describe('submitRegistration', () => {
     fd.append('email', 'john@example.com')
     fd.append('phone', '081234567890')
     fd.append('date_of_birth', '2000-01-01')
+    fd.append('place_of_birth', 'Manado')
+    fd.append('gender', 'Laki-laki')
+    fd.append('nim', '20123456')
+    fd.append('faculty', 'fip')
+    fd.append('study_program', 'fip_pgsd')
+    fd.append('semester', '4')
     fd.append('address', 'Jl. Contoh No. 123, Kelurahan, Kecamatan')
     fd.append('city', 'Manado')
     fd.append('province', 'Sulawesi Utara')
@@ -138,6 +124,8 @@ describe('submitRegistration', () => {
     fd.append('weight_kg', '60')
     fd.append('occupation', 'Mahasiswa')
     fd.append('education', 'Sarjana S1')
+    fd.append('essay', 'I want to join Nyong Noni UNIMA because I am passionate about culture and tourism promotion in North Sulawesi.')
+    fd.append('consent', 'true')
     const result = await submitRegistration(fd)
     expect(result.error).toBeUndefined()
     expect(result.data).toBeDefined()

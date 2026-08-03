@@ -23,10 +23,10 @@ describe('Header', () => {
 
   it('renders all navigation items (desktop + mobile)', () => {
     render(<Header />)
-    const navItems = ['Beranda', 'Tentang', 'Finalis', 'Hall of Fame', 'Prestasi', 'Galeri', 'Berita', 'Acara']
+    const navItems = ['Beranda', 'Tentang', 'Titleholders', 'Finalis', 'Hall of Fame', 'Prestasi Alumni', 'Galeri', 'Berita', 'Acara']
     navItems.forEach((item) => {
       const links = screen.getAllByText(item)
-      expect(links.length).toBe(2) // once in desktop nav, once in mobile nav
+      expect(links.length).toBe(2)
     })
   })
 
@@ -46,14 +46,8 @@ describe('Header', () => {
 
   it('renders brand logo text', () => {
     render(<Header />)
-    const logos = screen.getAllByText('Nyong Noni Sulut')
-    expect(logos.length).toBeGreaterThan(0)
-  })
-
-  it('renders register button', () => {
-    render(<Header />)
-    const buttons = screen.getAllByText('Daftar Sekarang')
-    expect(buttons.length).toBe(2)
+    expect(screen.getByText('Nyong Noni')).toBeInTheDocument()
+    expect(screen.getByText('UNIMA')).toBeInTheDocument()
   })
 
   it('renders skip link', () => {
@@ -83,6 +77,5 @@ describe('Header', () => {
     const mobileNav = screen.getByLabelText('Navigasi mobile')
     expect(within(mobileNav).getByText('Finalis')).toBeInTheDocument()
     expect(within(mobileNav).getByText('Acara')).toBeInTheDocument()
-    expect(within(mobileNav).getByText('Daftar Sekarang')).toBeInTheDocument()
   })
 })
