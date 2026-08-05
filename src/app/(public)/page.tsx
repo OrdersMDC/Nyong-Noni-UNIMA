@@ -3,15 +3,16 @@ import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Countdown } from '@/components/countdown'
 import { FinalistsCarousel } from '@/components/finalists-carousel'
-import { getPublicFinalists, getReigningPair, getTitleholders } from '@/server/actions/finalists'
+import { TitleholderCard } from '@/components/titleholder-card'
+import { getPublicFinalists } from '@/server/actions/finalists'
 import { getPublicNews, getPublicEvents } from '@/server/actions/content'
-import { getFaculties } from '@/server/actions/unima'
-import { MapPin, Instagram, ArrowRight, ChevronRight, Clock } from 'lucide-react'
+import { getCurrentTitleholders, getFaculties } from '@/server/actions/unima'
+import { ArrowRight, ChevronRight, Clock } from 'lucide-react'
 
 export default async function HomePage() {
-  const [finalists, reigningPair, news, events, faculties] = await Promise.all([
+  const [finalists, currentTitleholders, news, events, faculties] = await Promise.all([
     getPublicFinalists().catch(() => []),
-    getReigningPair().catch(() => null),
+    getCurrentTitleholders().catch(() => []),
     getPublicNews().catch(() => []),
     getPublicEvents().catch(() => []),
     getFaculties().catch(() => []),
@@ -54,43 +55,21 @@ export default async function HomePage() {
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent" />
       </section>
 
-      {/* ─── REIGNING PAIR ─── */}
-      {reigningPair && (reigningPair.nyong_name || reigningPair.noni_name) && (
+      {/* ─── CURRENT TITLEHOLDERS ─── */}
+      {currentTitleholders.length > 0 && (
         <section className="py-section bg-white">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-14">
               <span className="text-caption text-primary-blue font-semibold tracking-widest">
-                NYONG & NONI UNIMA {reigningPair.tahun}
+                NYONG & NONI UNIMA 2025
               </span>
               <h2 className="text-display-xl text-dark-text mt-3">Current Titleholders</h2>
               <div className="w-20 h-1 bg-gold mx-auto mt-4" />
             </div>
 
-            <div className="grid gap-8 sm:grid-cols-2 max-w-4xl mx-auto">
-              {[
-                reigningPair.nyong_name ? { label: reigningPair.category === 'Juara Utama' ? 'Nyong UNIMA' : `Nyong ${reigningPair.category}`, name: reigningPair.nyong_name, photo: reigningPair.nyong_photo_url, ig: reigningPair.nyong_instagram } : null,
-                reigningPair.noni_name ? { label: reigningPair.category === 'Juara Utama' ? 'Noni UNIMA' : `Noni ${reigningPair.category}`, name: reigningPair.noni_name, photo: reigningPair.noni_photo_url, ig: reigningPair.noni_instagram } : null,
-              ].filter(Boolean).map((item: any) => (
-                <div key={item.label} className="group relative overflow-hidden rounded-xxl bg-white border border-border shadow-sm hover:shadow-lg transition-all duration-300">
-                  <div className="aspect-[4/5] overflow-hidden bg-light-gray">
-                    {item.photo ? (
-                      <Image src={item.photo} alt={item.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-display-lg text-primary-blue/30 font-bold">
-                        {item.name?.[0] || 'N'}
-                      </div>
-                    )}
-                  </div>
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-6 pt-16">
-                    <span className="text-caption text-gold font-semibold tracking-widest">{item.label}</span>
-                    <h3 className="text-headline text-white mt-1">{item.name}</h3>
-                    {item.ig && (
-                      <a href={`https://instagram.com/${item.ig.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-white/70 hover:text-gold text-sm mt-2 transition-colors">
-                        <Instagram className="h-4 w-4" /> {item.ig}
-                      </a>
-                    )}
-                  </div>
-                </div>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {currentTitleholders.map((th: any) => (
+                <TitleholderCard key={th.id} item={th} />
               ))}
             </div>
 
