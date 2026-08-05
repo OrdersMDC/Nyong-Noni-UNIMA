@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { Instagram, GraduationCap, BookOpen, Quote } from 'lucide-react'
-import { genderBadge } from '@/lib/titleholders'
+import { genderBadge, titleLabel } from '@/lib/titleholders'
 
 interface TitleholderCardProps {
   item: {
@@ -12,9 +12,10 @@ interface TitleholderCardProps {
     instagram?: string | null
     biography?: string | null
   }
+  showGelar?: boolean
 }
 
-export function TitleholderCard({ item }: TitleholderCardProps) {
+export function TitleholderCard({ item, showGelar }: TitleholderCardProps) {
   return (
     <div className="bg-white rounded-[20px] border border-border overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
       {/* Photo */}
@@ -37,9 +38,15 @@ export function TitleholderCard({ item }: TitleholderCardProps) {
 
       {/* Info */}
       <div className="p-5">
-        <div className="mb-2 inline-flex items-center px-2 py-0.5 rounded-md bg-light-gray text-[10px] font-semibold uppercase tracking-widest text-dark-secondary">
-          {genderBadge(item.title)}
-        </div>
+        {showGelar ? (
+          <div className="mb-2 inline-block px-2 py-0.5 rounded-md bg-primary-blue/10 text-primary-blue text-[10px] font-semibold uppercase tracking-widest">
+            {titleLabel(item.title)}
+          </div>
+        ) : (
+          <div className="mb-2 inline-flex items-center px-2 py-0.5 rounded-md bg-light-gray text-[10px] font-semibold uppercase tracking-widest text-dark-secondary">
+            {genderBadge(item.title)}
+          </div>
+        )}
         <h3 className="text-headline text-dark-text mb-1">{item.name}</h3>
 
         {item.faculty && (

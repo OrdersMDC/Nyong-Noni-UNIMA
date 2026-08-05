@@ -55,3 +55,15 @@ export function genderBadge(title: string) {
   ) return 'Nyong Noni'
   return title.includes('Nyong') ? 'Nyong' : 'Noni'
 }
+
+export function titleLabel(title: string) {
+  const label = PAIR_LABELS[title]
+  if (!label) return title
+  if (
+    title.includes('Duta') ||
+    title.includes('Berbakat') ||
+    title.includes('Fotogenik') ||
+    title.includes('Persahabatan')
+  ) return label
+  return label.replace('Nyong Noni UNIMA', `${genderBadge(title)} UNIMA`)
+}
