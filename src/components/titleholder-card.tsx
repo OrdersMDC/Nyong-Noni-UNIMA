@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { Instagram, GraduationCap, BookOpen, Quote } from 'lucide-react'
-import { genderBadge, titleLabel } from '@/lib/titleholders'
+import { genderBadge, shortGelar, titleLabel } from '@/lib/titleholders'
 
 interface TitleholderCardProps {
   item: {
@@ -13,9 +13,10 @@ interface TitleholderCardProps {
     biography?: string | null
   }
   showGelar?: boolean
+  gelarShort?: boolean
 }
 
-export function TitleholderCard({ item, showGelar }: TitleholderCardProps) {
+export function TitleholderCard({ item, showGelar, gelarShort }: TitleholderCardProps) {
   return (
     <div className="bg-white rounded-[20px] border border-border overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
       {/* Photo */}
@@ -40,7 +41,7 @@ export function TitleholderCard({ item, showGelar }: TitleholderCardProps) {
       <div className="p-5">
         {showGelar ? (
           <div className="mb-2 inline-block px-2 py-0.5 rounded-md bg-primary-blue/10 text-primary-blue text-[10px] font-semibold uppercase tracking-widest">
-            {titleLabel(item.title)}
+            {gelarShort ? shortGelar(item.title) : titleLabel(item.title)}
           </div>
         ) : (
           <div className="mb-2 inline-flex items-center px-2 py-0.5 rounded-md bg-light-gray text-[10px] font-semibold uppercase tracking-widest text-dark-secondary">

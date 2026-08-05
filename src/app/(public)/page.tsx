@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Countdown } from '@/components/countdown'
 import { FinalistsCarousel } from '@/components/finalists-carousel'
-import { TitleholderCard } from '@/components/titleholder-card'
+import { TitleholdersGrid } from '@/components/titleholders-grid'
 import { getPublicFinalists } from '@/server/actions/finalists'
 import { getPublicNews, getPublicEvents } from '@/server/actions/content'
 import { getCurrentTitleholders, getFaculties } from '@/server/actions/unima'
@@ -67,11 +67,7 @@ export default async function HomePage() {
               <div className="w-20 h-1 bg-gold mx-auto mt-4" />
             </div>
 
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {currentTitleholders.map((th: any) => (
-                <TitleholderCard key={th.id} item={th} showGelar />
-              ))}
-            </div>
+            <TitleholdersGrid titleholders={currentTitleholders} />
 
             <div className="text-center mt-10">
               <Link href="/current-titleholders">

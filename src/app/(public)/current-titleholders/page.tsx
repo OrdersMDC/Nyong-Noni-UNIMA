@@ -1,6 +1,5 @@
 import { getCurrentTitleholders } from '@/server/actions/unima'
-import { TITLE_PAIRS, PAIR_LABELS } from '@/lib/titleholders'
-import { TitleholderCard } from '@/components/titleholder-card'
+import { TitleholdersGrid } from '@/components/titleholders-grid'
 
 export default async function CurrentTitleholdersPage() {
   const titleholders = await getCurrentTitleholders().catch(() => []) as any[]
@@ -38,42 +37,7 @@ export default async function CurrentTitleholdersPage() {
               </p>
             </div>
           ) : (
-            <div className="space-y-16">
-              {TITLE_PAIRS.map(([nyongTitle, noniTitle]) => {
-                const nyong = titleholders.find((t: any) => t.title === nyongTitle)
-                const noni = titleholders.find((t: any) => t.title === noniTitle)
-
-                if (!nyong && !noni) return null
-
-                const pairLabel = PAIR_LABELS[nyongTitle] || nyongTitle
-                const isMainPair = nyongTitle === 'Nyong UNIMA'
-
-                return (
-                  <div key={nyongTitle}>
-                    {/* Section label */}
-                    <div className="flex items-center gap-3 mb-8">
-                      <div className={`h-px flex-1 ${isMainPair ? 'bg-gold/30' : 'bg-hairline'}`} />
-                      <span
-                        className={`text-[13px] font-bold uppercase tracking-[0.15em] px-4 py-1.5 rounded-full ${
-                          isMainPair
-                            ? 'text-gold-dark bg-gold/10 border border-gold/20'
-                            : 'text-dark-secondary bg-white border border-border'
-                        }`}
-                      >
-                        {pairLabel}
-                      </span>
-                      <div className={`h-px flex-1 ${isMainPair ? 'bg-gold/30' : 'bg-hairline'}`} />
-                    </div>
-
-                    {/* Cards */}
-                    <div className="grid gap-6 md:grid-cols-2 max-w-3xl mx-auto">
-                      {nyong && <TitleholderCard item={nyong} />}
-                      {noni && <TitleholderCard item={noni} />}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+            <TitleholdersGrid titleholders={titleholders} />
           )}
         </div>
       </section>
