@@ -1,6 +1,7 @@
 # Nyong Noni UNIMA Official Portal
 
 
+
 \
 Portal resmi Nyong & Noni Universitas Negeri Manado — platform pemilihan duta mahasiswa di bidang kepemimpinan, budaya, pariwisata, dan prestasi akademik.
 
